@@ -7,6 +7,10 @@ public class TimestampRandomCodeGenerator : ICodeGenerator
     private readonly IDateTimeProvider _dateTimeProvider;
     private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
+    private const int TimestampPartLength = 4; 
+    private const int TotalLength = 8; 
+    private const int PaddingLength = 12; 
+    
     public TimestampRandomCodeGenerator(IDateTimeProvider dateTimeProvider)
     {
         _dateTimeProvider = dateTimeProvider;
@@ -28,10 +32,10 @@ public class TimestampRandomCodeGenerator : ICodeGenerator
         var timestamp = _dateTimeProvider.Ticks;
         var timestampPart = timestamp
             .ToString("X")
-            .PadRight(12, '0')
-            .Substring(0, 4);
+            .PadRight(PaddingLength, '0')
+            .Substring(0, TimestampPartLength);
         
-        var randomPart = GenerateRandomPart(6); 
+        var randomPart = GenerateRandomPart(TotalLength - TimestampPartLength); 
         
         return timestampPart + randomPart;
     }
