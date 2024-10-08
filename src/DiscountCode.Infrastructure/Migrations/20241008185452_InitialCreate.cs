@@ -36,7 +36,7 @@ namespace DiscountCode.Infrastructure.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsUsed = table.Column<bool>(type: "boolean", nullable: false),
                     UsedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    RowVersion = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false)
+                    RowVersion = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false, defaultValue: new byte[] { 0 })
                 },
                 constraints: table =>
                 {
