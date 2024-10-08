@@ -47,13 +47,6 @@ public class DiscountCodeService : IDiscountCodeService
             
             if (await _repository.MoveToDiscountCodesAsync(codesToMove))
             {
-                // foreach (var code in codesToMove)
-                // {
-                //     await _cache.SetStringAsync(code, "available", new DistributedCacheEntryOptions
-                //     {
-                //         AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(_settings.CodeCacheExpirationDays)
-                //     });
-                // }
                 return GenerateCodesResponse.Success(codesToMove);
             }
 

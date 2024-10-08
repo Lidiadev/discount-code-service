@@ -42,13 +42,5 @@ public class DiscountDbContextFactory : IDesignTimeDbContextFactory<DiscountDbCo
         optionsBuilder.UseNpgsql(connectionString);
 
         return new DiscountDbContext(optionsBuilder.Options);
-        
-        
-        // var optionsBuilder = new DbContextOptionsBuilder<DiscountDbContext>();
-        //
-        // // Use your connection string here
-        // optionsBuilder.UseNpgsql("connection string");
-        //
-        // return new DiscountDbContext(optionsBuilder.Options);
     }
 }

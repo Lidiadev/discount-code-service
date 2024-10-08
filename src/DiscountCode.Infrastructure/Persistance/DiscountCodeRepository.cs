@@ -66,7 +66,7 @@ public class DiscountCodeRepository : IDiscountCodeRepository
             {
                 Code = ac.Code,
                 CreatedAt = ac.CreatedAt,
-                IsUsed = false
+                IsUsed = false,
             });
 
         _context.AvailableDiscountCodes.RemoveRange(availableCodes);
@@ -81,11 +81,15 @@ public class DiscountCodeRepository : IDiscountCodeRepository
             .FirstOrDefaultAsync(dc => dc.Code == code);
 
         if (model == null)
+        {
             return null; // TODO
+        }
 
         var discountCode = Domain.Entities.DiscountCode.Create(model.Code, model.CreatedAt);
-        if (model.IsUsed)
+        if (model is { IsUsed: true, UsedAt: not null })
+        {
             discountCode.MarkAsUsed(model.UsedAt.Value);
+        }
 
         return discountCode;
     }

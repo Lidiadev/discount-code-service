@@ -16,25 +16,12 @@ public class TimestampRandomCodeGenerator : ICodeGenerator
         return codes;
     }
 
-    // TODO: NOT UNIQUE - getting insert errors!!
     private static string GenerateCode()
     {
-        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        var timestampPart = timestamp.ToString("X").PadLeft(8, '0').Substring(0, 4);
+        var timestamp = DateTimeOffset.UtcNow.Ticks;
+        var timestampPart = timestamp.ToString("X").PadRight(12, '0').Substring(0, 4);
         var randomPart = new string(Enumerable.Repeat(Chars, 4)
             .Select(s => s[Random.Next(s.Length)]).ToArray());
         return timestampPart + randomPart;
     }
-    
-    // public string GenerateCode()
-    // {
-    //     var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString("X");
-    //     var random = new Random();
-    //     const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    //     var randomPart = new string(Enumerable.Repeat(chars, 4)
-    //         .Select(s => s[random.Next(s.Length)])
-    //         .ToArray());
-    //     
-    //     return $"{timestamp.Substring(timestamp.Length - 4)}{randomPart}";
-    // }
 }

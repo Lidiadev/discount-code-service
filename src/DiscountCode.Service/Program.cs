@@ -21,12 +21,10 @@ var configuration = builder.Configuration;
 // Add services to the container.
 builder.Services.AddDbContext<DiscountDbContext>(options =>
     options.UseNpgsql(Environment.GetEnvironmentVariable("DEFAULT_CONNECTION_STRING")));
-        //configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = configuration.GetConnectionString(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING"));
-        //"RedisConnection");
 });
 
 builder.Services.AddScoped<IDiscountCodeRepository, DiscountCodeRepository>();
