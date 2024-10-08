@@ -29,6 +29,8 @@ message UseCodeResponse {
     NOT_FOUND = 1;
     ALREADY_USED = 2;
     CONCURRENCY_ERROR = 3;
+    INVALID = 4;
+    ERROR = 5;
   }
   Status status = 1;
   string message = 2;

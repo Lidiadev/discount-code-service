@@ -28,4 +28,17 @@ public class DiscountCode
 
         UsedAt = usedAt;
     }
+    
+    public static void Validate(string code, int requiredLength)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            throw new ArgumentException("Code cannot be null or empty.", nameof(code));
+        }
+
+        if (code.Length != requiredLength)
+        {
+            throw new ArgumentException($"Code must be {requiredLength} characters long.", nameof(code));
+        }
+    }
 }

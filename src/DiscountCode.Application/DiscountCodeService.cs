@@ -65,6 +65,8 @@ public class DiscountCodeService : IDiscountCodeService
     {
         try
         {
+            Domain.Entities.DiscountCode.Validate(code, _settings.CodeLength);  
+            
             var cacheResult = await _cache.GetStringAsync(code);
             if (cacheResult == "used")
             {
@@ -98,6 +100,11 @@ public class DiscountCodeService : IDiscountCodeService
 
             _logger.LogWarning("Concurrency error while using discount code: {Code}", code);
             return UseCodeResult.Failure(UseCodeStatus.ConcurrencyError, ErrorMessage.ConcurrencyError);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid discount code: {Code}", code);
+            return UseCodeResult.Failure(UseCodeStatus.Invalid, ErrorMessage.CodeInvalid);
         }
         catch (InvalidOperationException ex)
         {
