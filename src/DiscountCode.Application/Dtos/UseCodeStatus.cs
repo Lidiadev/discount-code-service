@@ -5,5 +5,6 @@ public enum UseCodeStatus
     Success,
     NotFound,
     AlreadyUsed,
-    ConcurrencyError
+    ConcurrencyError,
+    Error
 }

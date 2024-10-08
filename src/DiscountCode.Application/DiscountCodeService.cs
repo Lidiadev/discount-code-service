@@ -84,7 +84,7 @@ public class DiscountCodeService : IDiscountCodeService
 
             discountCode.MarkAsUsed(_dateTimeProvider.UtcNow);
 
-            if (await _repository.SaveChangesAsync())
+            if (await _repository.MarkAsModifiedAsync(discountCode))
             {
                 await _cache.SetStringAsync(code, "used", new DistributedCacheEntryOptions
                 {
@@ -96,8 +96,7 @@ public class DiscountCodeService : IDiscountCodeService
             }
 
             _logger.LogWarning("Concurrency error while using discount code: {Code}", code);
-            return UseCodeResult.Failure(UseCodeStatus.ConcurrencyError,
-                "Concurrency error occurred. Please try again.");
+            return UseCodeResult.Failure(UseCodeStatus.ConcurrencyError, "Concurrency error occurred. Please try again.");
         }
         catch (InvalidOperationException ex)
         {
@@ -107,8 +106,7 @@ public class DiscountCodeService : IDiscountCodeService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error using discount code: {Code}", code);
-            return UseCodeResult.Failure(UseCodeStatus.ConcurrencyError,
-                "An error occurred while using the discount code");
+            return UseCodeResult.Failure(UseCodeStatus.Error, "An error occurred while using the discount code");
         }
     }
 }

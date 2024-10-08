@@ -82,7 +82,7 @@ public class DiscountCodeRepository : IDiscountCodeRepository
 
         if (model == null)
         {
-            return null; // TODO
+            return null; 
         }
 
         var discountCode = Domain.Entities.DiscountCode.Create(model.Code, model.CreatedAt);
@@ -94,7 +94,23 @@ public class DiscountCodeRepository : IDiscountCodeRepository
         return discountCode;
     }
 
-    public async Task<bool> SaveChangesAsync()
+    public async Task<bool> MarkAsModifiedAsync(Domain.Entities.DiscountCode discountCode)
+    {
+        var model = await _context.DiscountCodes
+            .FirstOrDefaultAsync(dc => dc.Code == discountCode.Code);
+
+        if (model == null)
+        {
+            return false; 
+        }
+        
+        model.IsUsed = discountCode.IsUsed;
+        model.UsedAt = discountCode.UsedAt;
+
+        return await SaveChangesAsync();
+    }
+    
+    private async Task<bool> SaveChangesAsync()
     {
         return await _context.SaveChangesAsync() > 0;
     }
