@@ -12,7 +12,7 @@ public class GuidCodeGenerator : ICodeGenerator
     public IEnumerable<string> GenerateCodes(int count, int length)
     {
         var codes = new HashSet<string>();
-        while (codes.Count < count)
+        for (var i = 0; i < count; i++)
         {
             codes.Add(GenerateCode(length));
         }
@@ -24,7 +24,7 @@ public class GuidCodeGenerator : ICodeGenerator
     {
         var timestamp = _dateTimeProvider.Ticks;
         var guid = Guid.NewGuid().ToString("N");
-        var code = $"{timestamp:X}{guid.Substring(0, 6)}".ToUpper();
+        var code = $"{guid.Substring(0, 6)}{timestamp:X}".ToUpper();
         
         return code.Substring(0, length);
     }
