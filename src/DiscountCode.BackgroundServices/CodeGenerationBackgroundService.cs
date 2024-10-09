@@ -1,4 +1,5 @@
-﻿using DiscountCode.BackgroundServices.Options;
+﻿using DiscountCode.Application;
+using DiscountCode.BackgroundServices.Options;
 using DiscountCode.Domain;
 using DiscountCode.Domain.Entities;
 using DiscountCode.Domain.Generator;
@@ -58,14 +59,14 @@ public class CodeGenerationBackgroundService : BackgroundService
         try
         {
             using var scope = Services.CreateScope();
-            var repository = scope.ServiceProvider.GetRequiredService<IDiscountCodeRepository>();
+            var discountCodeService = scope.ServiceProvider.GetRequiredService<IDiscountCodeService>();
             
             var codes = _codeGenerator
                 .GenerateCodes(_settings.CodeGenerationBatchSize)
                 .Select(code => AvailableDiscountCode.Create(code, _dateTimeProvider.UtcNow))
                 .ToList();
             
-            await repository.AddAvailableCodesAsync(codes);
+            await discountCodeService.AddAvailableCodesAsync(codes);
             _logger.LogInformation("Generated {Count} new available discount codes", _settings.CodeGenerationBatchSize);
         }
         catch (Exception ex)

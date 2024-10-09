@@ -2,6 +2,7 @@
 using DiscountCode.Application.Dtos;
 using DiscountCode.Application.Options;
 using DiscountCode.Domain;
+using DiscountCode.Domain.Entities;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -43,16 +44,10 @@ public class DiscountCodeService : IDiscountCodeService
 
         try
         {
-            var availableCodes = await _repository.GetAvailableCodesAsync(count);
-            var codesToMove = availableCodes.Select(ac => ac.Code).ToList();
+            var availableCodes = await _repository.GenerateCodesAsync(count);
+            var codes = availableCodes.Select(ac => ac.Code).ToList();
             
-            if (await _repository.MoveToDiscountCodesAsync(codesToMove))
-            {
-                return GenerateCodesResponse.Success(codesToMove);
-            }
-
-            _logger.LogError("Failed to move {Count} codes from available to discount codes", codesToMove.Count);
-            return GenerateCodesResponse.Failure(ErrorMessage.ErrorMovingCodes);
+            return GenerateCodesResponse.Success(codes);
         }
         catch (Exception ex)
         {
@@ -116,5 +111,10 @@ public class DiscountCodeService : IDiscountCodeService
             _logger.LogError(ex, "Error using discount code: {Code}", code);
             return UseCodeResult.Failure(UseCodeStatus.Error, ErrorMessage.ErrorGeneratingCodes);
         }
+    }
+
+    public async Task AddAvailableCodesAsync(IList<AvailableDiscountCode> codes)
+    {
+        await _repository.AddAvailableCodesAsync(codes);
     }
 }

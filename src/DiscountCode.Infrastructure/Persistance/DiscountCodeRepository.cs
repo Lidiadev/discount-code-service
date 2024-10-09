@@ -17,20 +17,6 @@ public class DiscountCodeRepository : IDiscountCodeRepository
         _context = context;
     }
 
-    public async Task<IList<AvailableDiscountCode>> GetAvailableCodesAsync(int count)
-    {
-        var availableDiscountCodeModels = await _context.AvailableDiscountCodes
-            .OrderBy(m => m.Id)
-            .Take(count)
-            .ToListAsync();
-        
-        _logger.LogInformation("Getting available discount codes: {Count}", availableDiscountCodeModels.Count);
-
-        return availableDiscountCodeModels
-            .Select(m => AvailableDiscountCode.Create(m.Code, m.CreatedAt))
-            .ToList();
-    }
-
     public async Task AddAvailableCodesAsync(IList<AvailableDiscountCode> codes)
     {
         var availableDiscountCodeModels = codes
@@ -41,12 +27,54 @@ public class DiscountCodeRepository : IDiscountCodeRepository
             })
             .ToList();
         
-        _logger.LogInformation("Adding available discount codes: {Count}", availableDiscountCodeModels.Count);
         await _context.AvailableDiscountCodes.AddRangeAsync(availableDiscountCodeModels);
-        
         await _context.SaveChangesAsync();
     }
 
+    public async Task<IList<AvailableDiscountCode>> GenerateCodesAsync(int count)
+    {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try
+        {
+            var availableCodes = await _context.AvailableDiscountCodes
+                .OrderBy(m => m.Id)
+                .Take(count)
+                .ToListAsync();
+
+            if (availableCodes.Count != count)
+            {
+                _logger.LogWarning("Not all requested codes were available.");
+                return [];
+            }
+
+            var discountCodes = availableCodes
+                .Select(ac => new DiscountCodeModel
+                {
+                    Code = ac.Code,
+                    CreatedAt = ac.CreatedAt,
+                    IsUsed = false
+                })
+                .ToList();
+
+            _context.AvailableDiscountCodes.RemoveRange(availableCodes);
+            await _context.DiscountCodes.AddRangeAsync(discountCodes);
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return availableCodes
+                .Select(m => AvailableDiscountCode.Create(m.Code, m.CreatedAt))
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error moving available codes to discount codes.");
+            await transaction.RollbackAsync();
+            return [];
+        }
+    }
+    
     public async Task<bool> MoveToDiscountCodesAsync(IList<string> codes)
     {
         var availableCodes = await _context.AvailableDiscountCodes
