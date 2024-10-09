@@ -44,6 +44,7 @@ Redis caching reduces database load for frequently accessed data.
 - Implement sharding for the database to handle extremely large volumes of codes.
 - Add monitoring and alerting for code usage patterns and generation rates.
 - Implement a cleanup process for expired or long-unused codes.
+- Add UTs, integration tests and benchmark the code generation algorithms.
 
 # Running the solution
 ## Prerequisites
