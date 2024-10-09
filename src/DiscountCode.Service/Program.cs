@@ -28,7 +28,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 builder.Services.AddScoped<IDiscountCodeRepository, DiscountCodeRepository>();
-builder.Services.AddSingleton<ICodeGenerator, TimestampRandomCodeGenerator>();
+// builder.Services.AddSingleton<ICodeGenerator, TimestampRandomCodeGenerator>();
+builder.Services.AddSingleton<ICodeGenerator, UniqueCodeGenerator>();
 builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 builder.Services.AddScoped<IDiscountCodeService, DiscountCodeService>();
 

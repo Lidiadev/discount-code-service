@@ -45,13 +45,19 @@ public class DiscountCodeService : IDiscountCodeService
         if (count <= 0)
         {
             _logger.LogWarning("Requested code count {Count} is invalid", count);
-            return GenerateCodesResponse.Failure(ErrorMessage.CodeInvalid);
+            return GenerateCodesResponse.Failure(ErrorMessage.InvalidCount);
         }
 
         try
         {
             var availableCodes = await _repository.GenerateCodesAsync(count);
             var codes = availableCodes.Select(ac => ac.Code).ToList();
+
+            if (codes.Count == 0)
+            {
+                _logger.LogWarning("No codes have been generated");
+                return GenerateCodesResponse.Failure(ErrorMessage.ErrorNoCodeGenerated);
+            }
             
             return GenerateCodesResponse.Success(codes);
         }

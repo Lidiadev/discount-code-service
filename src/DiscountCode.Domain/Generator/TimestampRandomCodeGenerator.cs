@@ -40,7 +40,7 @@ public class TimestampRandomCodeGenerator : ICodeGenerator
         return timestampPart + randomPart;
     }
 
-    private string GenerateRandomPart(int length)
+    private static string GenerateRandomPart(int length)
     {
         var randomBytes = new byte[length];
         using (var rng = RandomNumberGenerator.Create())

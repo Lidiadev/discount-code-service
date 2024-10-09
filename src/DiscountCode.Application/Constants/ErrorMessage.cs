@@ -9,6 +9,6 @@ public static class ErrorMessage
     public const string GenerationFailed = "Failed to generate codes.";
     public const string MaximumCountExceeded = "Requested code count exceeds maximum allowed.";
     public const string InvalidCount = "Requested code count is not valid.";
-    public const string ErrorMovingCodes = "Failed to generate codes.";
+    public const string ErrorNoCodeGenerated = "Failed to generate codes.";
     public const string ErrorGeneratingCodes = "An error occurred while generating codes.";
 }
