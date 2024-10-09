@@ -29,16 +29,24 @@ public class DiscountCode
         UsedAt = usedAt;
     }
     
-    public static void Validate(string code, int requiredLength)
+    public static void Validate(string code, IList<int> validLengths)
     {
         if (string.IsNullOrWhiteSpace(code))
         {
-            throw new ArgumentException("Code cannot be null or empty.", nameof(code));
+            throw new ArgumentException("Code cannot be null or empty.");
         }
 
-        if (code.Length != requiredLength)
+        if (!validLengths.Contains(code.Length))
         {
-            throw new ArgumentException($"Code must be {requiredLength} characters long.", nameof(code));
+            var minLength = validLengths.Min();
+            var maxLength = validLengths.Max();
+
+            if (minLength == maxLength)
+            {
+                throw new ArgumentException($"Code must be {minLength} characters long.");
+            }
+            
+            throw new ArgumentException($"Code must be between {minLength} and {maxLength} characters long.");
         }
     }
 }

@@ -76,7 +76,7 @@ public class DiscountCodeService : IDiscountCodeService
     {
         try
         {
-            Domain.Entities.DiscountCode.Validate(request.Code, _settings.CodeLength);  
+            Domain.Entities.DiscountCode.Validate(request.Code, _settings.UsedCodeLength);  
             
             var cacheResult = await _cache.GetStringAsync(request.Code);
             if (cacheResult == CacheValue.Used)
