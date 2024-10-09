@@ -11,6 +11,7 @@ service DiscountService {
 
 message GenerateCodesRequest {
   int32 count = 1;
+  int32 length = 2;
 }
 
 message GenerateCodesResponse {

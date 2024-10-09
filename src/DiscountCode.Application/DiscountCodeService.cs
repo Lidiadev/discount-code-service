@@ -31,26 +31,30 @@ public class DiscountCodeService : IDiscountCodeService
         _settings = settings.Value;
     }
 
-    public async Task<GenerateCodesResponse> GenerateCodesAsync(int count)
+    public async Task<GenerateCodesResponse> GenerateCodesAsync(GenerateCodeRequest request)
     {
-        var maxGenerationLimit = _settings.MaxCodesPerRequest;
-        
-        if (count > maxGenerationLimit)
+        if (request.Count > _settings.MaxCodesPerRequest)
         {
             _logger
-                .LogWarning("Requested code count {Count} exceeds maximum allowed {MaxCount}", count, _settings.MaxCodesPerRequest);
+                .LogWarning("Requested code count {Count} exceeds maximum allowed {MaxCount}", request.Count, _settings.MaxCodesPerRequest);
             return GenerateCodesResponse.Failure(ErrorMessage.MaximumCountExceeded);
         }
         
-        if (count <= 0)
+        if (request.Count <= 0)
         {
-            _logger.LogWarning("Requested code count {Count} is invalid", count);
+            _logger.LogWarning("Requested code count {Count} is invalid", request.Count);
             return GenerateCodesResponse.Failure(ErrorMessage.InvalidCount);
+        }
+        
+        if (!_settings.CodeGenerationLengths.Contains(request.Length))
+        {
+            _logger.LogWarning("Requested code request {Length} is not valid", request.Length);
+            return GenerateCodesResponse.Failure(ErrorMessage.InvalidCodeLength);
         }
 
         try
         {
-            var availableCodes = await _repository.GenerateCodesAsync(count);
+            var availableCodes = await _repository.GenerateCodesAsync(request.Count, request.Length);
             var codes = availableCodes.Select(ac => ac.Code).ToList();
 
             if (codes.Count == 0)
@@ -68,23 +72,23 @@ public class DiscountCodeService : IDiscountCodeService
         }
     }
 
-    public async Task<UseCodeResult> UseCodeAsync(string code)
+    public async Task<UseCodeResult> UseCodeAsync(UseCodeRequest request)
     {
         try
         {
-            Domain.Entities.DiscountCode.Validate(code, _settings.CodeLength);  
+            Domain.Entities.DiscountCode.Validate(request.Code, _settings.CodeLength);  
             
-            var cacheResult = await _cache.GetStringAsync(code);
-            if (cacheResult == "used")
+            var cacheResult = await _cache.GetStringAsync(request.Code);
+            if (cacheResult == CacheValue.Used)
             {
                 return UseCodeResult.Failure(UseCodeStatus.AlreadyUsed, ErrorMessage.CodeAlreadyUsed);
             }
 
-            var discountCode = await _repository.GetDiscountCodeAsync(code);
+            var discountCode = await _repository.GetDiscountCodeAsync(request.Code);
 
             if (discountCode == null)
             {
-                await _cache.SetStringAsync(code, "not_found", new DistributedCacheEntryOptions
+                await _cache.SetStringAsync(request.Code, CacheValue.NotFound, new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_settings.NotFoundCacheExpirationMinutes)
                 });
@@ -96,31 +100,31 @@ public class DiscountCodeService : IDiscountCodeService
 
             if (await _repository.MarkAsModifiedAsync(discountCode))
             {
-                await _cache.SetStringAsync(code, "used", new DistributedCacheEntryOptions
+                await _cache.SetStringAsync(request.Code, CacheValue.Used, new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(_settings.UsedCodeCacheExpirationDays)
                 });
 
-                _logger.LogInformation("Successfully used discount code: {Code}", code);
+                _logger.LogInformation("Successfully used discount code: {Code}", request.Code);
                 return UseCodeResult.Success(UseCodeStatus.Success, "Discount code successfully used");
             }
 
-            _logger.LogWarning("Concurrency error while using discount code: {Code}", code);
+            _logger.LogWarning("Concurrency error while using discount code: {Code}", request.Code);
             return UseCodeResult.Failure(UseCodeStatus.ConcurrencyError, ErrorMessage.ConcurrencyError);
         }
         catch (ArgumentException ex)
         {
-            _logger.LogWarning(ex, "Invalid discount code: {Code}", code);
+            _logger.LogWarning(ex, "Invalid discount code: {Code}", request.Code);
             return UseCodeResult.Failure(UseCodeStatus.Invalid, ErrorMessage.CodeInvalid);
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogWarning(ex, "Attempted to use already used discount code: {Code}", code);
+            _logger.LogWarning(ex, "Attempted to use already used discount code: {Code}", request.Code);
             return UseCodeResult.Failure(UseCodeStatus.AlreadyUsed, ErrorMessage.CodeAlreadyUsed);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error using discount code: {Code}", code);
+            _logger.LogError(ex, "Error using discount code: {Code}", request.Code);
             return UseCodeResult.Failure(UseCodeStatus.Error, ErrorMessage.ErrorGeneratingCodes);
         }
     }

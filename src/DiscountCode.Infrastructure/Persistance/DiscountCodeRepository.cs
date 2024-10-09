@@ -31,12 +31,12 @@ public class DiscountCodeRepository : IDiscountCodeRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IList<AvailableDiscountCode>> GenerateCodesAsync(int count)
+    public async Task<IList<AvailableDiscountCode>> GenerateCodesAsync(int count, int codeLength)
     {
         await using var transaction = await _context.Database.BeginTransactionAsync();
         
         var availableCodes = await _context.AvailableDiscountCodes
-            .FromSql($"SELECT * FROM \"AvailableDiscountCodes\" ORDER BY \"Id\" LIMIT {count} FOR UPDATE")
+            .FromSql($"SELECT * FROM \"AvailableDiscountCodes\" WHERE LENGTH(\"Code\") = {codeLength} ORDER BY \"Id\" LIMIT {count} FOR UPDATE")
             .ToListAsync();
 
         try
@@ -71,9 +71,6 @@ public class DiscountCodeRepository : IDiscountCodeRepository
         {
             _logger.LogError(ex, "Error moving available codes to discount codes.");
             await transaction.RollbackAsync();
-            
-            _context.AvailableDiscountCodes.RemoveRange(availableCodes);
-            await _context.SaveChangesAsync();
             
             return [];
         }

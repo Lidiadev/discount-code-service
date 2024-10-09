@@ -5,24 +5,23 @@ namespace DiscountCode.Domain.Generator;
 public class UniqueCodeGenerator : ICodeGenerator
 {
     private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private const int TotalLength = 8;
     private BigInteger _currentNumber = BigInteger.Zero;
 
-    public IEnumerable<string> GenerateCodes(int count)
+    public IEnumerable<string> GenerateCodes(int count, int length)
     {
         var codes = new List<string>(count);
         
         for (var i = 0; i < count; i++)
         {
-            codes.Add(GenerateCode());
+            codes.Add(GenerateCode(length));
         }
         
         return codes;
     }
 
-    private string GenerateCode()
+    private string GenerateCode(int length)
     {
-        var code = ConvertToBase36(_currentNumber).PadLeft(TotalLength, '0');
+        var code = ConvertToBase36(_currentNumber).PadLeft(length, '0');
         
         _currentNumber++;
         

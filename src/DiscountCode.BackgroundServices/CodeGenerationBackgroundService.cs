@@ -60,14 +60,18 @@ public class CodeGenerationBackgroundService : BackgroundService
         {
             using var scope = Services.CreateScope();
             var discountCodeService = scope.ServiceProvider.GetRequiredService<IDiscountCodeService>();
+
+            foreach (var length in _settings.CodeGenerationLengths)
+            {
+                var codes = _codeGenerator
+                    .GenerateCodes(_settings.CodeGenerationBatchSize, length)
+                    .Select(code => AvailableDiscountCode.Create(code, _dateTimeProvider.UtcNow))
+                    .ToList();
             
-            var codes = _codeGenerator
-                .GenerateCodes(_settings.CodeGenerationBatchSize)
-                .Select(code => AvailableDiscountCode.Create(code, _dateTimeProvider.UtcNow))
-                .ToList();
-            
-            await discountCodeService.AddAvailableCodesAsync(codes);
-            _logger.LogInformation("Generated {Count} new available discount codes", _settings.CodeGenerationBatchSize);
+                await discountCodeService.AddAvailableCodesAsync(codes);
+                _logger.LogInformation("Generated {Count} new available discount codes with length {Length}",
+                    _settings.CodeGenerationBatchSize, length);
+            }
         }
         catch (Exception ex)
         {

@@ -8,6 +8,7 @@ public static class ErrorMessage
     public const string ConcurrencyError = "Concurrency error occurred. Please try again.";
     public const string GenerationFailed = "Failed to generate codes.";
     public const string MaximumCountExceeded = "Requested code count exceeds maximum allowed.";
+    public const string InvalidCodeLength = "Requested length is not valid.";
     public const string InvalidCount = "Requested code count is not valid.";
     public const string ErrorNoCodeGenerated = "Failed to generate codes.";
     public const string ErrorGeneratingCodes = "An error occurred while generating codes.";

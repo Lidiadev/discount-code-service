@@ -5,7 +5,7 @@ namespace DiscountCode.Application;
 
 public interface IDiscountCodeService
 {
-    Task<GenerateCodesResponse> GenerateCodesAsync(int count);
-    Task<UseCodeResult> UseCodeAsync(string code);
+    Task<GenerateCodesResponse> GenerateCodesAsync(GenerateCodeRequest request);
+    Task<UseCodeResult> UseCodeAsync(UseCodeRequest request);
     Task AddAvailableCodesAsync(IList<AvailableDiscountCode> codes);
 }
