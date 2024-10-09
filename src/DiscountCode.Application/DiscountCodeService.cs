@@ -41,6 +41,12 @@ public class DiscountCodeService : IDiscountCodeService
                 .LogWarning("Requested code count {Count} exceeds maximum allowed {MaxCount}", count, _settings.MaxCodesPerRequest);
             return GenerateCodesResponse.Failure(ErrorMessage.MaximumCountExceeded);
         }
+        
+        if (count <= 0)
+        {
+            _logger.LogWarning("Requested code count {Count} is invalid", count);
+            return GenerateCodesResponse.Failure(ErrorMessage.CodeInvalid);
+        }
 
         try
         {
