@@ -1,7 +1,48 @@
-## Overview
+# Overview
 
 This project is a Discount Code Service that allows generating and using discount codes through a gRPC interface. The service is built using .NET and is containerized using Docker.
 
+## Database Structure
+The system uses two tables to manage discount codes:
+
+### 1. AvailableDiscountCodes Table
+   Stores newly generated, unused codes.
+
+### 2. DiscountCodes Table
+   Stores codes that have been issued to users.
+
+## Key Processes
+
+### Code Generation
+
+The background service periodically triggers code generation.
+New codes are generated and inserted into the `AvailableDiscountCodes` table.
+The system maintains a pool of available codes to ensure quick response times.
+
+### Code Issuance
+
+When a client requests codes, the system moves codes from `AvailableDiscountCodes` to `DiscountCodes`.
+This process is atomic to ensure code uniqueness and availability.
+
+### Code Usage
+
+When a code is used, its status is updated in the `DiscountCodes` table.
+Optimistic concurrency control is used to handle simultaneous updates.
+
+### Scalability Considerations
+
+The two-table structure allows for efficient code generation and issuance.
+The background service can be scaled independently to increase code generation throughput.
+Redis caching reduces database load for frequently accessed data.
+
+### Future Improvements
+
+- Improve the code generation algorithm to avoid collision.
+- Implement sharding for the database to handle extremely large volumes of codes.
+- Add monitoring and alerting for code usage patterns and generation rates.
+- Implement a cleanup process for expired or long-unused codes.
+
+# Running the solution
 ## Prerequisites
 
 Before you start, ensure you have the following installed:
@@ -49,5 +90,3 @@ This command will:
 Once the services are running, you can access the Discount Code Service through the specified port:
 
 - `http://localhost:5023`
-
-
