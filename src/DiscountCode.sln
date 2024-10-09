@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscountCode.Infrastructure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscountCode.BackgroundServices", "DiscountCode.BackgroundServices\DiscountCode.BackgroundServices.csproj", "{B606AEFB-10DD-49C6-B0FA-B299072C84D4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3E9B19D5-56F1-4ADC-88F2-CF21FC7404CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscountCode.Domain.Tests", "..\tests\DiscountCode.Domain.Tests\DiscountCode.Domain.Tests.csproj", "{62829D6B-E8C1-49E4-946F-E05AF458E4E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,5 +51,12 @@ Global
 		{B606AEFB-10DD-49C6-B0FA-B299072C84D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B606AEFB-10DD-49C6-B0FA-B299072C84D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B606AEFB-10DD-49C6-B0FA-B299072C84D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62829D6B-E8C1-49E4-946F-E05AF458E4E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62829D6B-E8C1-49E4-946F-E05AF458E4E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62829D6B-E8C1-49E4-946F-E05AF458E4E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62829D6B-E8C1-49E4-946F-E05AF458E4E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{62829D6B-E8C1-49E4-946F-E05AF458E4E3} = {3E9B19D5-56F1-4ADC-88F2-CF21FC7404CD}
 	EndGlobalSection
 EndGlobal
