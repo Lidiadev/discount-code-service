@@ -2,6 +2,8 @@
 
 This project is a Discount Code Service that allows generating and using discount codes through a gRPC interface. The service is built using .NET and is containerized using Docker.
 
+![Overview](https://github.com/Lidiadev/discount-code-service/blob/main/assets/Overview.png?raw=true)
+
 ## Database Structure
 The system uses two tables to manage discount codes:
 
