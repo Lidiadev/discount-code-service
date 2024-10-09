@@ -40,6 +40,7 @@ Redis caching reduces database load for frequently accessed data.
 ### Future Improvements
 
 - Improve the code generation algorithm to avoid collision.
+- Add available codes in the cache.
 - Implement sharding for the database to handle extremely large volumes of codes.
 - Add monitoring and alerting for code usage patterns and generation rates.
 - Implement a cleanup process for expired or long-unused codes.
