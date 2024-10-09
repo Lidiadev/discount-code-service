@@ -16,8 +16,6 @@ builder.Configuration.AddEnvironmentVariables();
 
 DotEnv.Load();
 
-var configuration = builder.Configuration;
-
 // Add services to the container.
 builder.Services.AddDbContext<DiscountDbContext>(options =>
     options.UseNpgsql(Environment.GetEnvironmentVariable("DEFAULT_CONNECTION_STRING")));

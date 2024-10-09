@@ -34,14 +34,14 @@ public class DiscountCodeRepository : IDiscountCodeRepository
     public async Task<IList<AvailableDiscountCode>> GenerateCodesAsync(int count)
     {
         await using var transaction = await _context.Database.BeginTransactionAsync();
+        
+        var availableCodes = await _context.AvailableDiscountCodes
+            .FromSql($"SELECT * FROM \"AvailableDiscountCodes\" ORDER BY \"Id\" LIMIT {count} FOR UPDATE")
+            .ToListAsync();
 
         try
         {
-            var availableCodes = await _context.AvailableDiscountCodes
-                .OrderBy(m => m.Id)
-                .Take(count)
-                .ToListAsync();
-
+            
             if (availableCodes.Count != count)
             {
                 _logger.LogWarning("Not all requested codes were available.");
@@ -71,6 +71,10 @@ public class DiscountCodeRepository : IDiscountCodeRepository
         {
             _logger.LogError(ex, "Error moving available codes to discount codes.");
             await transaction.RollbackAsync();
+            
+            _context.AvailableDiscountCodes.RemoveRange(availableCodes);
+            await _context.SaveChangesAsync();
+            
             return [];
         }
     }
