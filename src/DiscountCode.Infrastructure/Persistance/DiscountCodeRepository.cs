@@ -75,32 +75,23 @@ public class DiscountCodeRepository : IDiscountCodeRepository
         }
     }
     
-    public async Task<bool> MoveToDiscountCodesAsync(IList<string> codes)
+    public async Task<Domain.Entities.DiscountCode> GetDiscountCodeAsync(string code)
     {
-        var availableCodes = await _context.AvailableDiscountCodes
-            .Where(ac => codes.Contains(ac.Code))
-            .ToListAsync();
+        var model = await _context.DiscountCodes
+            .FirstOrDefaultAsync(dc => dc.Code == code);
 
-        if (availableCodes.Count != codes.Count)
+        if (model == null)
         {
-            _logger.LogWarning(
-                "Not all requested codes were available. Requested: {RequestedCount}, Available: {AvailableCount}",
-                codes.Count, availableCodes.Count);
-            return false;
+            return null; 
         }
 
-        var discountCodes = availableCodes
-            .Select(ac => new DiscountCodeModel
-            {
-                Code = ac.Code,
-                CreatedAt = ac.CreatedAt,
-                IsUsed = false,
-            });
+        var discountCode = Domain.Entities.DiscountCode.Create(model.Code, model.CreatedAt);
+        if (model is { IsUsed: true, UsedAt: not null })
+        {
+            discountCode.MarkAsUsed(model.UsedAt.Value);
+        }
 
-        _context.AvailableDiscountCodes.RemoveRange(availableCodes);
-        await _context.DiscountCodes.AddRangeAsync(discountCodes);
-
-        return await SaveChangesAsync();
+        return discountCode;
     }
 
     public async Task<bool> MarkAsModifiedAsync(Domain.Entities.DiscountCode discountCode)
