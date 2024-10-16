@@ -6,7 +6,6 @@ public interface IDiscountCodeRepository
 {
     Task AddAvailableCodesAsync(IList<AvailableDiscountCode> codes);
     Task<IList<AvailableDiscountCode>> GenerateCodesAsync(int count, int codeLength);
-    Task<bool> MoveToDiscountCodesAsync(IList<string> codes);
     Task<Entities.DiscountCode> GetDiscountCodeAsync(string code);
     Task<bool> MarkAsModifiedAsync(Entities.DiscountCode discountCode);
 }

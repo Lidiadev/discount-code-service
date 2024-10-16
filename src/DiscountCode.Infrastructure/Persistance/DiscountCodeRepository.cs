@@ -41,7 +41,6 @@ public class DiscountCodeRepository : IDiscountCodeRepository
 
         try
         {
-            
             if (availableCodes.Count != count)
             {
                 _logger.LogWarning("Not all requested codes were available.");
@@ -102,25 +101,6 @@ public class DiscountCodeRepository : IDiscountCodeRepository
         await _context.DiscountCodes.AddRangeAsync(discountCodes);
 
         return await SaveChangesAsync();
-    }
-
-    public async Task<Domain.Entities.DiscountCode> GetDiscountCodeAsync(string code)
-    {
-        var model = await _context.DiscountCodes
-            .FirstOrDefaultAsync(dc => dc.Code == code);
-
-        if (model == null)
-        {
-            return null; 
-        }
-
-        var discountCode = Domain.Entities.DiscountCode.Create(model.Code, model.CreatedAt);
-        if (model is { IsUsed: true, UsedAt: not null })
-        {
-            discountCode.MarkAsUsed(model.UsedAt.Value);
-        }
-
-        return discountCode;
     }
 
     public async Task<bool> MarkAsModifiedAsync(Domain.Entities.DiscountCode discountCode)
